@@ -1,6 +1,6 @@
 let circlePos, circleVel;
 let compassHeading;
-let labelBottom;
+let labelBottom = 0;
 const circleRadius = 15;
 
 function setup() {
@@ -41,27 +41,47 @@ function draw() {
     circleVel.y *= -1;
   }
 
-  circle(circlePos.x, circlePos.y, 2 * circleRadius);
-
   if (compassHeading) {
-    const { heading, accuracy } = compassHeading;
-    push();
-
-    angleMode(DEGREES);
-    textAlign(CENTER);
-
-    fill('gray')
-    translate(width / 2, (labelBottom + height) / 2);
-    arc(0, 0, 100, 100, 90 - heading - accuracy, 90 - heading + accuracy, PIE);
-
-    rotate(-heading);
-    textSize(30);
-    text("N", 0, -25);
-    // text("S", 0, 25);
-    // text("E", 25, 0);
-    // text("W", -25, 0);
-    pop();
+    drawCompass();
   }
+  circle(circlePos.x, circlePos.y, 2 * circleRadius);
+}
+
+function drawCompass() {
+  const { heading, accuracy } = compassHeading;
+  const northHeading = -90 - heading;
+
+  push();
+  translate(width / 2, (labelBottom + height) / 2);
+  angleMode(DEGREES);
+  textAlign(CENTER);
+
+  fill(180);
+  noStroke();
+  arc(0, 0, 200, 200, northHeading - accuracy, northHeading + accuracy, PIE);
+
+  stroke(0);
+  line(-60, 0, 60, 0);
+  line(0, -60, 0, 60);
+  strokeWeight(3);
+  line(0, -80, 0, -120);
+
+  stroke(20);
+  for (let i = 0; i < 360; i += 5) {
+    let a = i - heading;
+    strokeWeight(i % 30 ? 1 : 3);
+    line(80 * cos(a), 80 * sin(a), 100 * cos(a), 100 * sin(a));
+  }
+
+  textSize(25);
+  noStroke();
+  fill(0);
+  text("北", 55 * cos(northHeading), 55 * sin(northHeading));
+
+  // text("S", 0, 25);
+  // text("E", 25, 0);
+  // text("W", -25, 0);
+  pop();
 }
 
 function requestDeviceMotionPermission() {
