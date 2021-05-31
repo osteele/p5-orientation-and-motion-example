@@ -1,12 +1,23 @@
 # JavaScript Motion and Orientation Demo (in P5)
 
-This is a demonstration of the [device motion and orientation JavaScript APIs][Detecting Device
-  Orientation],
-that read accelerometer data from a mobile device.
+This is a demonstration of the [device motion and orientation JavaScript
+APIs][Detecting Device Orientation], that read accelerometer data from a mobile
+device.
 
-It uses [p5.js](https://p5js.org).
+You may interact with the page at <https://osteele.github.io/p5-orientation-and-motion-example/>.
 
-## Instructions
+The motion and orientation data is displayed in three ways:
+
+- All motion and orientation values are displayed in textual form
+- A ball moves around the screen in response to the accelerometer
+- A compass displays the heading and the heading accuracy
+
+(The ball rotation is simply a frill, and does not directly relate to any sensor
+value.)
+
+The code uses [p5.js](https://p5js.org).
+
+## Development Instructions
 
 Note that the page needs to *served* over HTTPS, and *viewed* on a mobile device.
 
