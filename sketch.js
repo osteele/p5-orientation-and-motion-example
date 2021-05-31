@@ -30,12 +30,12 @@ function draw() {
   circlePos.add(circleVel);
 
   // bounce the ball off the sides
-  if ((circlePos.x < 0 || width <= circlePos.x) && circlePos.x * circleVel.x > 0) {
-    circlePos.x += circleVel.x;
+  if ((circlePos.x < 0 || width <= circlePos.x + circleRadius) && circlePos.x * circleVel.x > 0) {
+    circlePos.x -= circleVel.x;
     circleVel.x *= -1;
   }
-  if ((circlePos.y < 0 || height <= circlePos.y) && circlePos.y * circleVel.y > 0) {
-    circlePos.y += circleVel.y;
+  if ((circlePos.y < 0 || height <= circlePos.y + circleRadius) && circlePos.y * circleVel.y > 0) {
+    circlePos.y -= circleVel.y;
     circleVel.y *= -1;
   }
 
