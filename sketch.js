@@ -12,7 +12,7 @@ function setup() {
       .position(50, 50)
       .mousePressed(() => {
         requestDeviceMotionPermission();
-        createTextFields();
+        createSensorValueDisplay();
         startButton.hide();
       })
   } else {
@@ -28,6 +28,7 @@ function draw() {
   // update the ball position
   circleVel.mult(0.9);
   circlePos.add(circleVel);
+
   // bounce the ball off the sides
   if ((circlePos.x < 0 || width <= circlePos.x) && circlePos.x * circleVel.x > 0) {
     circlePos.x += circleVel.x;
@@ -57,50 +58,65 @@ function handleMotion(data) {
   const g = data.accelerationIncludingGravity;
   const a = createVector(g.x, -g.y).mult(0.5);
   circleVel.add(a);
-  updateLabels(data);
+  displaySensorValues(data);
 }
 
 function handleOrientation(data) {
-  updateLabels({ orientation: data });
+  console.info(data)
+  displaySensorValues({ orientation: data });
 }
 
 /*
  * Display the values
  */
 
-const textFields = {};
+let sensorValueDisplayFn;
 
 const sensorNames = {
   // from DeviceMotion
   acceleration: ['x', 'y', 'z'],
   accelerationIncludingGravity: ['x', 'y', 'z'],
   rotationRate: ['alpha', 'beta', 'gamma'],
+  // interval: Number,
+  // interval: n => (1 / n).toFixed() + ' Hz';
 
   // from DeviceOrientation
-  orientation: ['alpha', 'beta', 'gamma'],
+  orientation: [
+    'alpha', 'beta', 'gamma',
+    // only on mobile Safari:
+    'webkitCompassAccuracy',
+    'webkitCompassHeading',
+  ]
 }
 
-function createTextFields() {
+function createSensorValueDisplay() {
   let y = 20;
-  for (const sensorName in sensorNames) {
-    for (const axis of sensorNames[sensorName]) {
-      const key = sensorName + '.' + axis;
-      textFields[key] = createDiv().position(10, y);
+  function createDisplay(label, typespec) {
+    if (typespec === Number) {
+      const div = createDiv().position(10, y);
       y += 20;
+      return value => div.elt.innerText = label + ': ' + value.toFixed(2);
+    } else if (Array.isArray(typespec)) {
+      return createDisplay(label, Object.fromEntries(typespec.map(s => [s, Number])));
+    } else {
+      const propertyNames = Object.keys(typespec);
+      const setters = {};
+      for (const propertyName of propertyNames) {
+        const lab = label ? label + '.' + propertyName : propertyName;
+        setters[propertyName] = createDisplay(lab, typespec[propertyName]);
+      }
+      return values => {
+        for (const propertyName of propertyNames) {
+          const value = values[propertyName];
+          if (value !== undefined)
+            setters[propertyName](value);
+        }
+      }
     }
   }
-  // textFields['interval'] = createDiv().position(10, y);
+  sensorValueDisplayFn = createDisplay(null, sensorNames);
 }
 
-function updateLabels(data) {
-  console.info(data);
-  for (const sensorName in sensorNames) {
-    if (!data[sensorName]) continue;
-    for (const axis of sensorNames[sensorName]) {
-      const key = sensorName + '.' + axis;
-      const value = data[sensorName][axis];
-      textFields[key].elt.innerText = key + ': ' + value.toFixed(2);
-    }
-  }
-  // textFields['interval'].elt.innerText = 'interval: ' + (1 / data.interval).toFixed() + ' Hz';
+function displaySensorValues(data) {
+  sensorValueDisplayFn(data);
 }
