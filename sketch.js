@@ -94,30 +94,27 @@ class Ball {
 
   update() {
     const { pos, vel, radius } = this;
-    const topMargin = 1;
-    const botMargin = 4;
+    const botRightMargin = 1;
 
     // update the ball position
     vel.mult(0.9);
     pos.add(vel);
 
     // bounce the ball off the sides
-    const topLeft = p5.Vector.sub(pos, createVector(radius, radius + topMargin));
-    const botRight = p5.Vector.add(pos, createVector(radius + botMargin, radius + botMargin));
+    const topLeft = p5.Vector.sub(pos, createVector(radius, radius));
+    const botRight = p5.Vector.add(pos, createVector(radius + botRightMargin, radius));
     if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * vel.x > 0) {
-      pos.x = vel.x < 0 ? radius : width - radius;
-      if (topLeft.x < 0) {
-        this.rotationSpeed = vel.y / radius;
-      } else {
-        this.rotationSpeed = - vel.y / radius;
+      pos.x = vel.x < 0 ? radius : width - radius - botRightMargin;
+      this.rotationSpeed = vel.y / radius;
+      if (topLeft.x > 0) {
+        this.rotationSpeed *= -1;
       }
     }
     if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * vel.y > 0) {
-      pos.y = vel.y < 0 ? topMargin + radius : height - radius;
-      if (topLeft.y > topMargin) {
-        this.rotationSpeed = vel.x / radius;
-      } else {
-        this.rotationSpeed = - vel.x / radius;
+      pos.y = vel.y < 0 ? radius : height - radius;
+      this.rotationSpeed = vel.x / radius;
+      if (topLeft.y < 0) {
+        this.rotationSpeed *= -1;
       }
     }
     this.angle += this.rotationSpeed;
@@ -210,34 +207,40 @@ const sensorNames = {
 function createSensorValueDisplay() {
   const x = 5;
   let y = 15;
-  function createDisplay(label, typespec) {
+  function createDisplay(typespec, label = '') {
     if (typespec === Number) {
       const div = createDiv('x').position(x, y);
       y += div.elt.clientHeight;
       div.elt.innerText = '';
       return value => div.elt.innerText = label + ': ' + value.toFixed(2);
     } else if (Array.isArray(typespec)) {
-      return createDisplay(label, Object.fromEntries(typespec.map(s => [s, Number])));
+      return createDisplay(Object.fromEntries(typespec.map(s => [s, Number])), label);
     } else {
-      const propertyNames = Object.keys(typespec);
-      const setters = {};
-      for (const propertyName of propertyNames) {
-        const lab = label ? label + '.' + propertyName : propertyName;
-        setters[propertyName] = createDisplay(lab, typespec[propertyName]);
-      }
-      return values => {
-        for (const propertyName of propertyNames) {
-          const value = values[propertyName];
-          if (value !== undefined)
-            setters[propertyName](value);
+      const setters = mapValues(typespec, (propertySpec, propertyName) => {
+        const childLabel = `${label}.${propertyName}`.replace(/^\./, '');
+        return createDisplay(propertySpec, childLabel);
+      });
+      return obj => {
+        for (const propertyName in typespec) {
+          if (propertyName in obj) {
+            setters[propertyName](obj[propertyName]);
+          }
         }
       }
     }
   }
-  sensorValueDisplayFn = createDisplay(null, sensorNames);
+  sensorValueDisplayFn = createDisplay(sensorNames);
   labelBottom = y;
 }
 
 function displaySensorValues(data) {
   sensorValueDisplayFn(data);
+}
+
+/*
+ * Utilities
+ */
+
+function mapValues(obj, fn) {
+  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, fn(v, k, obj)]))
 }
