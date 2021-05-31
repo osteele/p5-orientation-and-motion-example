@@ -1,4 +1,9 @@
 body {
   margin: 0;
+  background: black;
   color: #aaa;
+}
+
+.start-button {
+  font-size: 20px;
 }

@@ -11,13 +11,13 @@ function setup() {
 
   if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) {
     const startButton = createButton("Press to start")
-      .style("font-size: 20px")
-      .position(50, 50)
+      .addClass("start-button")
       .mousePressed(() => {
         requestDeviceMotionPermission();
         createSensorValueDisplay();
         startButton.hide();
-      })
+      });
+    startButton.position((width - startButton.elt.clientWidth) / 2, 50);
   } else if (testMode) {
     createSensorValueDisplay();
     setInterval(() => {
@@ -36,7 +36,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  clear();
   stroke(255);
   noFill();
 
