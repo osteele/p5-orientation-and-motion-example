@@ -52,6 +52,12 @@ MDN Articles:
 - [DeviceMotionEvent
   reference](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent)
 
+Other documentation:
+
+- [Google Developer Docs: Device Orientation & Motion](https://developers.google.com/web/fundamentals/native-hardware/device-orientation/)
+- [Apple Developer Documentation: Device Orientation Event](https://developer.apple.com/documentation/webkitjs/deviceorientationevent)
+- [Apple Developer Documentation: Device Motion Event](https://developer.apple.com/documentation/webkitjs/devicemotionevent)
+
 [Detecting Device Orientation]: https://developer.mozilla.org/en-US/docs/Web/Events/Detecting_device_orientation
 
 ## License
