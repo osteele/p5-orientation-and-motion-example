@@ -6,7 +6,7 @@ function setup() {
   circlePos = createVector(width, height).mult(0.5);
   circleVel = createVector();
 
-  if (window.DeviceMotionEvent) {
+  if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) {
     const startButton = createButton("Press to start")
       .style("font-size: 20px")
       .position(50, 50)
@@ -16,7 +16,7 @@ function setup() {
         startButton.hide();
       })
   } else {
-    createDiv("DeviceMotion is not available on this browser and device")
+    createDiv("DeviceMotion is not available in this browser. Try visiting this page on a mobile device.")
       .style("font-size: 20px")
       .position(10, 10);
   }
