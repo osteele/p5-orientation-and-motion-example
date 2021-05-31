@@ -48,6 +48,92 @@ function draw() {
   ball.draw();
 }
 
+function requestDeviceMotionPermission() {
+  if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) {
+    DeviceMotionEvent.requestPermission()
+      .then(() => {
+        window.addEventListener('devicemotion', handleMotion, true);
+        window.addEventListener('deviceorientation', handleOrientation);
+      })
+  } else if (window.DeviceMotionEvent) {
+    window.ondevicemotion = handleMotionData;
+  }
+}
+
+function handleMotion(data) {
+  const g = data.accelerationIncludingGravity;
+  const a = createVector(g.x, -g.y).mult(0.5);
+  ball.accelerate(a);
+
+  displaySensorValues(data);
+}
+
+function handleOrientation(data) {
+  const { webkitCompassHeading: heading, webkitCompassAccuracy: accuracy } = data;
+  compassHeading = { heading, accuracy };
+
+  displaySensorValues({ orientation: data });
+}
+
+/*
+ * Objects
+ */
+
+class Ball {
+  constructor() {
+    this.radius = 15;
+    this.pos = createVector(width, height).mult(0.5);
+    this.vel = createVector();
+    this.angle = 0;
+    this.rotationSpeed = 1;
+  }
+
+  accelerate(acc) {
+    ball.vel.add(acc);
+  }
+
+  update() {
+    const { pos, vel, radius } = this;
+    const topMargin = 1;
+    const botMargin = 4;
+
+    // update the ball position
+    vel.mult(0.9);
+    pos.add(vel);
+
+    // bounce the ball off the sides
+    const topLeft = p5.Vector.sub(pos, createVector(radius, radius + topMargin));
+    const botRight = p5.Vector.add(pos, createVector(radius + botMargin, radius + botMargin));
+    if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * vel.x > 0) {
+      pos.x = vel.x < 0 ? radius : width - radius;
+      if (topLeft.x < 0) {
+        this.rotationSpeed = vel.y / radius;
+      } else {
+        this.rotationSpeed = - vel.y / radius;
+      }
+    }
+    if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * vel.y > 0) {
+      pos.y = vel.y < 0 ? topMargin + radius : height - radius;
+      if (topLeft.y > topMargin) {
+        this.rotationSpeed = vel.x / radius;
+      } else {
+        this.rotationSpeed = - vel.x / radius;
+      }
+    }
+    this.angle += this.rotationSpeed;
+    this.rotationSpeed *= 0.99;
+  }
+
+  draw() {
+    const { pos, radius } = this;
+    const dotRadius = 6;
+    const dotPos = p5.Vector.add(pos, p5.Vector.fromAngle(this.angle, radius - dotRadius));
+
+    circle(pos.x, pos.y, 2 * radius);
+    circle(dotPos.x, dotPos.y, 2 * dotRadius);
+  }
+}
+
 function drawCompass() {
   const { heading, accuracy } = compassHeading;
   const northHeading = -90 - heading;
@@ -97,83 +183,6 @@ function drawCompass() {
   }
   pop();
 }
-
-function requestDeviceMotionPermission() {
-  if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) {
-    DeviceMotionEvent.requestPermission()
-      .then(() => {
-        window.addEventListener('devicemotion', handleMotion, true);
-        window.addEventListener('deviceorientation', handleOrientation);
-      })
-  } else if (window.DeviceMotionEvent) {
-    window.ondevicemotion = handleMotionData;
-  }
-}
-
-function handleMotion(data) {
-  const g = data.accelerationIncludingGravity;
-  const a = createVector(g.x, -g.y).mult(0.5);
-  ball.accelerate(a);
-
-  displaySensorValues(data);
-}
-
-function handleOrientation(data) {
-  const { webkitCompassHeading: heading, webkitCompassAccuracy: accuracy } = data;
-  compassHeading = { heading, accuracy };
-
-  displaySensorValues({ orientation: data });
-}
-
-class Ball {
-  constructor() {
-    this.radius = 15;
-    this.pos = createVector(width, height).mult(0.5);
-    this.vel = createVector();
-    this.angle = 0;
-    this.rotationSpeed = 1 / 50;
-  }
-
-  accelerate(acc) {
-    ball.vel.add(acc);
-  }
-
-  update() {
-    // update the ball position
-    this.vel.mult(0.9);
-    this.pos.add(this.vel);
-
-    // bounce the ball off the sides
-    const topLeft = p5.Vector.sub(this.pos, createVector(this.radius, this.radius + 5));
-    const botRight = p5.Vector.add(this.pos, createVector(this.radius, this.radius));
-    if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * this.vel.x > 0) {
-      this.pos.x = this.vel.x < 0 ? this.radius : width - this.radius;
-      if (topLeft.x < 0) {
-        this.rotationSpeed = this.vel.y / this.radius;
-      } else {
-        this.rotationSpeed = - this.vel.y / this.radius;
-      }
-    }
-    if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * this.vel.y > 0) {
-      this.pos.y = this.vel.y < 0 ? 5 + this.radius : height - this.radius;
-      if (topLeft.y > 5) {
-        this.rotationSpeed = this.vel.x / this.radius;
-      } else {
-        this.rotationSpeed = - this.vel.x / this.radius;
-      }
-    }
-    this.angle += this.rotationSpeed;
-    this.rotationSpeed *= 0.99;
-  }
-
-  draw() {
-    const dotRadius = 6;
-    const dotPos = p5.Vector.add(this.pos, p5.Vector.fromAngle(this.angle, this.radius - dotRadius));
-    circle(this.pos.x, this.pos.y, 2 * this.radius);
-    circle(dotPos.x, dotPos.y, 2 * dotRadius);
-  }
-}
-
 
 /*
  * Display the values
