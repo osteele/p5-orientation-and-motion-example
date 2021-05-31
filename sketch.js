@@ -1,4 +1,6 @@
 let circlePos, circleVel;
+let compassHeading;
+let labelBottom;
 const circleRadius = 15;
 
 function setup() {
@@ -40,6 +42,26 @@ function draw() {
   }
 
   circle(circlePos.x, circlePos.y, 2 * circleRadius);
+
+  if (compassHeading) {
+    const { heading, accuracy } = compassHeading;
+    push();
+
+    angleMode(DEGREES);
+    textAlign(CENTER);
+
+    fill('gray')
+    translate(width / 2, (labelBottom + height) / 2);
+    arc(0, 0, 100, 100, 90 - heading - accuracy, 90 - heading + accuracy, PIE);
+
+    rotate(-heading);
+    textSize(30);
+    text("N", 0, -25);
+    // text("S", 0, 25);
+    // text("E", 25, 0);
+    // text("W", -25, 0);
+    pop();
+  }
 }
 
 function requestDeviceMotionPermission() {
@@ -58,11 +80,14 @@ function handleMotion(data) {
   const g = data.accelerationIncludingGravity;
   const a = createVector(g.x, -g.y).mult(0.5);
   circleVel.add(a);
+
   displaySensorValues(data);
 }
 
 function handleOrientation(data) {
-  console.info(data)
+  const { webkitCompassHeading: heading, webkitCompassAccuracy: accuracy } = data;
+  compassHeading = { heading, accuracy };
+
   displaySensorValues({ orientation: data });
 }
 
@@ -115,6 +140,7 @@ function createSensorValueDisplay() {
     }
   }
   sensorValueDisplayFn = createDisplay(null, sensorNames);
+  labelBottom = y;
 }
 
 function displaySensorValues(data) {
