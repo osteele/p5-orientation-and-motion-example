@@ -88,24 +88,24 @@ function drawCompass() {
   }
 
   // indicators
-  for (let i = 0; i < 360; i += 5) {
-    const a = i - heading;
-    const sw = i % 30 ? 1 : 3;
-    const ir = 80 + sw / 2;
-    const or = 100 - sw / 2;
+  for (let deg = 0; deg < 360; deg += 5) {
+    const rad = radians(deg - heading);
+    const sw = deg % 30 ? 1 : 3;
+    const p0 = p5.Vector.fromAngle(rad, 80 + sw / 2);
+    const p1 = p5.Vector.fromAngle(rad, 100 - sw / 2);
     strokeWeight(sw);
-    line(ir * cos(a), ir * sin(a), or * cos(a), or * sin(a));
+    line(p0.x, p0.y, p1.x, p1.y);
   }
 
   // direction labels
-  noStroke();
+  stroke(0);
   textAlign(CENTER);
   textSize(25);
   for (let i = 0; i < 4; i++) {
-    fill(i ? 160 : color(128, 32, 32));
+    const c = p5.Vector.fromAngle(radians(northHeading + 90 * i), 55);
+    fill(i ? 160 : color(192, 32, 32));
     textStyle(i ? NORMAL : BOLD);
-    const a = northHeading + 90 * i;
-    text("北东南西".charAt(i), 55 * cos(a), 55 * sin(a));
+    text("北东南西".charAt(i), c.x, c.y);
   }
   pop();
 }
