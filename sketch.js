@@ -58,30 +58,35 @@ function drawCompass() {
   angleMode(DEGREES);
   textAlign(CENTER);
 
-  fill(64);
   noStroke();
-  arc(0, 0, 200, 200, northHeading - accuracy, northHeading + accuracy, PIE);
+  for (let da = -accuracy; da < accuracy; da += 2) {
+    fill(map(abs(da), accuracy, 0, 64, 192));
+    arc(0, 0, 200, 200, northHeading + da, northHeading + da + 2, PIE);
+  }
 
-  stroke(255);
+  stroke(160);
   line(-60, 0, 60, 0);
   line(0, -60, 0, 60);
   strokeWeight(3);
-  line(0, -80, 0, -120);
+  line(0, -80 - 3 / 2, 0, -115);
 
-  stroke(230);
   for (let i = 0; i < 360; i += 5) {
-    let a = i - heading;
-    strokeWeight(i % 30 ? 1 : 3);
-    line(80 * cos(a), 80 * sin(a), 100 * cos(a), 100 * sin(a));
+    const a = i - heading;
+    const sw = i % 30 ? 1 : 3;
+    const ir = 80 + sw / 2;
+    const or = 100 - sw / 2;
+    strokeWeight(sw);
+    line(ir * cos(a), ir * sin(a), or * cos(a), or * sin(a));
   }
 
   textSize(25);
   noStroke();
-  fill(255);
-  text("北", 55 * cos(northHeading), 55 * sin(northHeading));
-  // text("S", 0, 25);
-  // text("E", 25, 0);
-  // text("W", -25, 0);
+  for (let i = 0; i < 4; i++) {
+    fill(i ? 160 : color(128, 32, 32));
+    textStyle(i ? NORMAL : BOLD);
+    const a = northHeading + 90 * i;
+    text("北东南西".charAt(i), 55 * cos(a), 55 * sin(a));
+  }
   pop();
 }
 
@@ -136,11 +141,13 @@ const sensorNames = {
 }
 
 function createSensorValueDisplay() {
-  let y = 20;
+  const x = 5;
+  let y = 15;
   function createDisplay(label, typespec) {
     if (typespec === Number) {
-      const div = createDiv().position(10, y);
-      y += 20;
+      const div = createDiv('x').position(x, y);
+      y += div.elt.clientHeight;
+      div.elt.innerText = '';
       return value => div.elt.innerText = label + ': ' + value.toFixed(2);
     } else if (Array.isArray(typespec)) {
       return createDisplay(label, Object.fromEntries(typespec.map(s => [s, Number])));
