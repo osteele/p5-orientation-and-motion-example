@@ -25,7 +25,9 @@ function setup() {
 }
 
 function draw() {
-  background(255);
+  background(0);
+  stroke(255);
+  noFill();
 
   // update the ball position
   circleVel.mult(0.9);
@@ -56,17 +58,17 @@ function drawCompass() {
   angleMode(DEGREES);
   textAlign(CENTER);
 
-  fill(180);
+  fill(64);
   noStroke();
   arc(0, 0, 200, 200, northHeading - accuracy, northHeading + accuracy, PIE);
 
-  stroke(0);
+  stroke(255);
   line(-60, 0, 60, 0);
   line(0, -60, 0, 60);
   strokeWeight(3);
   line(0, -80, 0, -120);
 
-  stroke(20);
+  stroke(230);
   for (let i = 0; i < 360; i += 5) {
     let a = i - heading;
     strokeWeight(i % 30 ? 1 : 3);
@@ -75,9 +77,8 @@ function drawCompass() {
 
   textSize(25);
   noStroke();
-  fill(0);
+  fill(255);
   text("北", 55 * cos(northHeading), 55 * sin(northHeading));
-
   // text("S", 0, 25);
   // text("E", 25, 0);
   // text("W", -25, 0);
