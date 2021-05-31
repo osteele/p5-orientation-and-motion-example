@@ -1,7 +1,8 @@
+const testMode = window.location.hash === '#test';
+const circleRadius = 15;
 let circlePos, circleVel;
 let compassHeading;
 let labelBottom = 0;
-const circleRadius = 15;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -17,6 +18,16 @@ function setup() {
         createSensorValueDisplay();
         startButton.hide();
       })
+  } else if (testMode) {
+    createSensorValueDisplay();
+    setInterval(() => {
+      const accelerationIncludingGravity = {
+        x: 8 * noise(frameCount / 100, 0) - 4,
+        y: 8 * noise(frameCount / 150, 1) - 4,
+      }
+      handleMotion({ accelerationIncludingGravity });
+      handleOrientation({ webkitCompassHeading: map(mouseX, 0, width, 0, 360), webkitCompassAccuracy: 20 });
+    }, 1000 / 60);
   } else {
     createDiv("DeviceMotion is not available in this browser. Try visiting this page on a mobile device.")
       .style("font-size: 20px")
@@ -43,7 +54,6 @@ function draw() {
     circleVel.y *= -1;
   }
 
-  // compassHeading = { heading: map(mouseX, 0, width, 0, 360), accuracy: 20 };
   if (compassHeading) {
     drawCompass();
   }
