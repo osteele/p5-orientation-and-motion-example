@@ -25,8 +25,10 @@ function setup() {
         x: 8 * noise(frameCount / 100, 0) - 4,
         y: 8 * noise(frameCount / 150, 1) - 4,
       }
+      const heading = 360 * noise(frameCount / 350, 2);
+      // const heading = map(mouseX, 0, width, 0, 360);
       handleMotion({ accelerationIncludingGravity });
-      handleOrientation({ webkitCompassHeading: map(mouseX, 0, width, 0, 360), webkitCompassAccuracy: 20 });
+      handleOrientation({ webkitCompassHeading: heading, webkitCompassAccuracy: 20 });
     }, 1000 / 60);
   } else {
     createDiv("DeviceMotion is not available in this browser. Try visiting this page on a mobile device.")
@@ -141,9 +143,9 @@ function drawCompass() {
 
   // accuracy arc
   noStroke();
-  for (let da = -accuracy; da < accuracy; da += 2) {
+  for (let da = accuracy; da > 0; da -= 1) {
     fill(map(abs(da), accuracy, 0, 64, 192));
-    arc(0, 0, 200, 200, northHeading + da, northHeading + da + 2, PIE);
+    arc(0, 0, 200, 200, northHeading - da, northHeading + da, PIE);
   }
 
   // crosshairs
@@ -174,7 +176,7 @@ function drawCompass() {
   textSize(25);
   for (let i = 0; i < 4; i++) {
     const c = p5.Vector.fromAngle(radians(northHeading + 90 * i), 55);
-    fill(i ? 160 : color(192, 32, 32));
+    fill(i ? 160 : color(192, 64, 64));
     textStyle(i ? NORMAL : BOLD);
     text("北东南西".charAt(i), c.x, c.y);
   }
