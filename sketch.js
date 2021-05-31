@@ -1,11 +1,12 @@
 const testMode = window.location.hash === '#test';
-const circleRadius = 15;
-let ballPos, ballVel;
+const ballRadius = 15;
+let ballPos, ballVel, ballAngle = 0, ballAngleSpeed = 0;
 let compassHeading;
 let labelBottom = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  angleMode(DEGREES);
   ballPos = createVector(width, height).mult(0.5);
   ballVel = createVector();
 
@@ -45,21 +46,36 @@ function draw() {
   ballPos.add(ballVel);
 
   // bounce the ball off the sides
-  const topLeft = p5.Vector.sub(ballPos, createVector(circleRadius, circleRadius + 5));
-  const botRight = p5.Vector.add(ballPos, createVector(circleRadius, circleRadius));
+  const topLeft = p5.Vector.sub(ballPos, createVector(ballRadius, ballRadius + 5));
+  const botRight = p5.Vector.add(ballPos, createVector(ballRadius, ballRadius));
   if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * ballVel.x > 0) {
-    ballPos.x -= ballVel.x;
-    ballVel.x *= -1;
+    ballPos.x = ballVel.x < 0 ? ballRadius : width - ballRadius;
+    if (topLeft.x < 0) {
+      ballAngleSpeed = ballVel.y / ballRadius;
+    } else {
+      ballAngleSpeed = - ballVel.y / ballRadius;
+    }
   }
   if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * ballVel.y > 0) {
-    ballPos.y -= ballVel.y;
-    ballVel.y *= -1;
+    ballPos.y = ballVel.y < 0 ? 5 + ballRadius : height - ballRadius;
+    if (topLeft.y > 5) {
+      ballAngleSpeed = ballVel.x / ballRadius;
+    } else {
+      ballAngleSpeed = - ballVel.x / ballRadius;
+    }
   }
+  ballAngle += ballAngleSpeed;
 
   if (compassHeading) {
     drawCompass();
   }
-  circle(ballPos.x, ballPos.y, 2 * circleRadius);
+
+  // draw the ball
+  circle(ballPos.x, ballPos.y, 2 * ballRadius);
+  const dotPos = p5.Vector.add(ballPos, p5.Vector.fromAngle(ballAngle, ballRadius - 6));
+  // fill(255, 100);
+  // noStroke();
+  circle(dotPos.x, dotPos.y, 12);
 }
 
 function drawCompass() {
