@@ -43,6 +43,7 @@ function draw() {
     circleVel.y *= -1;
   }
 
+  // compassHeading = { heading: map(mouseX, 0, width, 0, 360), accuracy: 20 };
   if (compassHeading) {
     drawCompass();
   }
@@ -56,20 +57,27 @@ function drawCompass() {
   push();
   translate(width / 2, (labelBottom + height) / 2);
   angleMode(DEGREES);
-  textAlign(CENTER);
 
+  // accuracy arc
   noStroke();
   for (let da = -accuracy; da < accuracy; da += 2) {
     fill(map(abs(da), accuracy, 0, 64, 192));
     arc(0, 0, 200, 200, northHeading + da, northHeading + da + 2, PIE);
   }
 
-  stroke(160);
-  line(-60, 0, 60, 0);
-  line(0, -60, 0, 60);
-  strokeWeight(3);
-  line(0, -80 - 3 / 2, 0, -115);
+  // crosshairs
+  {
+    // duck from the labels
+    const h = abs(heading % 90 - 45) - 45;
+    const len = map(abs(h), 0, 45, 30, 60, true);
+    stroke(160);
+    line(-len, 0, len, 0);
+    line(0, -len, 0, len);
+    strokeWeight(3);
+    line(0, -80 - 3 / 2, 0, -115);
+  }
 
+  // indicators
   for (let i = 0; i < 360; i += 5) {
     const a = i - heading;
     const sw = i % 30 ? 1 : 3;
@@ -79,8 +87,10 @@ function drawCompass() {
     line(ir * cos(a), ir * sin(a), or * cos(a), or * sin(a));
   }
 
-  textSize(25);
+  // direction labels
   noStroke();
+  textAlign(CENTER);
+  textSize(25);
   for (let i = 0; i < 4; i++) {
     fill(i ? 160 : color(128, 32, 32));
     textStyle(i ? NORMAL : BOLD);
