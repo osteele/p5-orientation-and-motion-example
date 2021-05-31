@@ -1,14 +1,13 @@
 const testMode = window.location.hash === '#test';
-const ballRadius = 15;
-let ballPos, ballVel, ballAngle = 0, ballAngleSpeed = 0;
-let compassHeading;
+let ball;
 let labelBottom = 0;
+let compassHeading;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
-  ballPos = createVector(width, height).mult(0.5);
-  ballVel = createVector();
+
+  ball = new Ball();
 
   if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) {
     const startButton = createButton("Press to start")
@@ -41,41 +40,12 @@ function draw() {
   stroke(255);
   noFill();
 
-  // update the ball position
-  ballVel.mult(0.9);
-  ballPos.add(ballVel);
-
-  // bounce the ball off the sides
-  const topLeft = p5.Vector.sub(ballPos, createVector(ballRadius, ballRadius + 5));
-  const botRight = p5.Vector.add(ballPos, createVector(ballRadius, ballRadius));
-  if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * ballVel.x > 0) {
-    ballPos.x = ballVel.x < 0 ? ballRadius : width - ballRadius;
-    if (topLeft.x < 0) {
-      ballAngleSpeed = ballVel.y / ballRadius;
-    } else {
-      ballAngleSpeed = - ballVel.y / ballRadius;
-    }
-  }
-  if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * ballVel.y > 0) {
-    ballPos.y = ballVel.y < 0 ? 5 + ballRadius : height - ballRadius;
-    if (topLeft.y > 5) {
-      ballAngleSpeed = ballVel.x / ballRadius;
-    } else {
-      ballAngleSpeed = - ballVel.x / ballRadius;
-    }
-  }
-  ballAngle += ballAngleSpeed;
-
   if (compassHeading) {
     drawCompass();
   }
 
-  // draw the ball
-  circle(ballPos.x, ballPos.y, 2 * ballRadius);
-  const dotPos = p5.Vector.add(ballPos, p5.Vector.fromAngle(ballAngle, ballRadius - 6));
-  // fill(255, 100);
-  // noStroke();
-  circle(dotPos.x, dotPos.y, 12);
+  ball.update();
+  ball.draw();
 }
 
 function drawCompass() {
@@ -143,7 +113,7 @@ function requestDeviceMotionPermission() {
 function handleMotion(data) {
   const g = data.accelerationIncludingGravity;
   const a = createVector(g.x, -g.y).mult(0.5);
-  ballVel.add(a);
+  ball.accelerate(a);
 
   displaySensorValues(data);
 }
@@ -154,6 +124,56 @@ function handleOrientation(data) {
 
   displaySensorValues({ orientation: data });
 }
+
+class Ball {
+  constructor() {
+    this.radius = 15;
+    this.pos = createVector(width, height).mult(0.5);
+    this.vel = createVector();
+    this.angle = 0;
+    this.rotationSpeed = 1 / 50;
+  }
+
+  accelerate(acc) {
+    ball.vel.add(acc);
+  }
+
+  update() {
+    // update the ball position
+    this.vel.mult(0.9);
+    this.pos.add(this.vel);
+
+    // bounce the ball off the sides
+    const topLeft = p5.Vector.sub(this.pos, createVector(this.radius, this.radius + 5));
+    const botRight = p5.Vector.add(this.pos, createVector(this.radius, this.radius));
+    if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * this.vel.x > 0) {
+      this.pos.x = this.vel.x < 0 ? this.radius : width - this.radius;
+      if (topLeft.x < 0) {
+        this.rotationSpeed = this.vel.y / this.radius;
+      } else {
+        this.rotationSpeed = - this.vel.y / this.radius;
+      }
+    }
+    if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * this.vel.y > 0) {
+      this.pos.y = this.vel.y < 0 ? 5 + this.radius : height - this.radius;
+      if (topLeft.y > 5) {
+        this.rotationSpeed = this.vel.x / this.radius;
+      } else {
+        this.rotationSpeed = - this.vel.x / this.radius;
+      }
+    }
+    this.angle += this.rotationSpeed;
+    this.rotationSpeed *= 0.99;
+  }
+
+  draw() {
+    const dotRadius = 6;
+    const dotPos = p5.Vector.add(this.pos, p5.Vector.fromAngle(this.angle, this.radius - dotRadius));
+    circle(this.pos.x, this.pos.y, 2 * this.radius);
+    circle(dotPos.x, dotPos.y, 2 * dotRadius);
+  }
+}
+
 
 /*
  * Display the values
