@@ -96,24 +96,24 @@ class Ball {
 
   update() {
     const { pos, vel, radius } = this;
-    const botRightMargin = 1;
+    const margin = 1;
 
     // update the ball position
     vel.mult(0.9);
     pos.add(vel);
 
     // bounce the ball off the sides
-    const topLeft = p5.Vector.sub(pos, createVector(radius, radius));
-    const botRight = p5.Vector.add(pos, createVector(radius + botRightMargin, radius));
+    const topLeft = p5.Vector.sub(pos, createVector(radius + margin, radius + margin));
+    const botRight = p5.Vector.add(pos, createVector(radius + margin, radius + margin));
     if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * vel.x > 0) {
-      pos.x = vel.x < 0 ? radius : width - radius - botRightMargin;
+      pos.x = vel.x < 0 ? radius + margin : width - radius - margin;
       this.rotationSpeed = vel.y / radius;
       if (topLeft.x > 0) {
         this.rotationSpeed *= -1;
       }
     }
     if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * vel.y > 0) {
-      pos.y = vel.y < 0 ? radius : height - radius;
+      pos.y = vel.y < 0 ? radius + margin : height - radius - margin;
       this.rotationSpeed = vel.x / radius;
       if (topLeft.y < 0) {
         this.rotationSpeed *= -1;
