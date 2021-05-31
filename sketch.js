@@ -1,13 +1,13 @@
 const testMode = window.location.hash === '#test';
 const circleRadius = 15;
-let circlePos, circleVel;
+let ballPos, ballVel;
 let compassHeading;
 let labelBottom = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  circlePos = createVector(width, height).mult(0.5);
-  circleVel = createVector();
+  ballPos = createVector(width, height).mult(0.5);
+  ballVel = createVector();
 
   if (window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) {
     const startButton = createButton("Press to start")
@@ -41,23 +41,25 @@ function draw() {
   noFill();
 
   // update the ball position
-  circleVel.mult(0.9);
-  circlePos.add(circleVel);
+  ballVel.mult(0.9);
+  ballPos.add(ballVel);
 
   // bounce the ball off the sides
-  if ((circlePos.x < 0 || width <= circlePos.x + circleRadius) && circlePos.x * circleVel.x > 0) {
-    circlePos.x -= circleVel.x;
-    circleVel.x *= -1;
+  const topLeft = p5.Vector.sub(ballPos, createVector(circleRadius, circleRadius + 5));
+  const botRight = p5.Vector.add(ballPos, createVector(circleRadius, circleRadius));
+  if ((topLeft.x < 0 || width <= botRight.x) && topLeft.x * ballVel.x > 0) {
+    ballPos.x -= ballVel.x;
+    ballVel.x *= -1;
   }
-  if ((circlePos.y < 0 || height <= circlePos.y + circleRadius) && circlePos.y * circleVel.y > 0) {
-    circlePos.y -= circleVel.y;
-    circleVel.y *= -1;
+  if ((topLeft.y < 0 || height <= botRight.y) && topLeft.y * ballVel.y > 0) {
+    ballPos.y -= ballVel.y;
+    ballVel.y *= -1;
   }
 
   if (compassHeading) {
     drawCompass();
   }
-  circle(circlePos.x, circlePos.y, 2 * circleRadius);
+  circle(ballPos.x, ballPos.y, 2 * circleRadius);
 }
 
 function drawCompass() {
@@ -125,7 +127,7 @@ function requestDeviceMotionPermission() {
 function handleMotion(data) {
   const g = data.accelerationIncludingGravity;
   const a = createVector(g.x, -g.y).mult(0.5);
-  circleVel.add(a);
+  ballVel.add(a);
 
   displaySensorValues(data);
 }
