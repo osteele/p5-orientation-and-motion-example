@@ -213,7 +213,10 @@ function createSensorValueDisplay() {
       const div = createDiv('x').position(x, y);
       y += div.elt.clientHeight;
       div.elt.innerText = '';
-      return value => div.elt.innerText = label + ': ' + value.toFixed(2);
+      return value => {
+        const sign = value < 0 ? '' : '<span class="sign"></span>';
+        div.elt.innerHTML = `${label}: ${sign}${value.toFixed(2)}`;
+      };
     } else if (Array.isArray(typespec)) {
       return createDisplay(Object.fromEntries(typespec.map(s => [s, Number])), label);
     } else {

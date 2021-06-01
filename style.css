@@ -13,3 +13,9 @@ body {
   font-size: 20px;
   margin: 10px;
 }
+
+.sign {
+  display: inline-block;
+  width: 0.3em;
+  height: 1lh;
+}
