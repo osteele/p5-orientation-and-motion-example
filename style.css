@@ -7,3 +7,9 @@ body {
 .start-button {
   font-size: 20px;
 }
+
+.warning {
+  display: none;
+  font-size: 20px;
+  margin: 10px;
+}

@@ -25,15 +25,14 @@ function setup() {
         x: 8 * noise(frameCount / 100, 0) - 4,
         y: 8 * noise(frameCount / 150, 1) - 4,
       }
-      const heading = 360 * noise(frameCount / 350, 2);
-      // const heading = map(mouseX, 0, width, 0, 360);
       handleMotion({ accelerationIncludingGravity });
-      handleOrientation({ webkitCompassHeading: heading, webkitCompassAccuracy: 20 });
+
+      const webkitCompassHeading = 360 * noise(frameCount / 350, 2);
+      // const webkitCompassHeading = map(mouseX, 0, width, 0, 360);
+      handleOrientation({ webkitCompassHeading, webkitCompassAccuracy: 20 });
     }, 1000 / 60);
   } else {
-    createDiv("DeviceMotion is not available in this browser. Try visiting this page on a mobile device.")
-      .style("font-size: 20px")
-      .position(10, 10);
+    select(".warning").show();
   }
 }
 
@@ -96,7 +95,7 @@ class Ball {
 
   update() {
     const { pos, vel, radius } = this;
-    const margin = 1;
+    const margin = 1 / 2;
 
     // update the ball position
     vel.mult(0.9);
