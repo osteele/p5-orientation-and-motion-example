@@ -8,11 +8,11 @@ You may interact with the page at <https://osteele.github.io/p5-orientation-and-
 
 The motion and orientation data is displayed in three ways:
 
-- All motion and orientation values are displayed in textual form
-- A ball moves around the screen in response to the accelerometer
-- A compass displays the heading and the heading accuracy
+1. All motion and orientation values are displayed in textual form
+2. A ball moves around the screen in response to the accelerometer
+3. A compass displays the heading and the heading accuracy
 
-(The ball rotation is simply a frill, and does not directly relate to any sensor
+(The ball rotation is simply a frill. It does not directly relate to any sensor
 value.)
 
 The code uses [p5.js](https://p5js.org).
@@ -21,21 +21,23 @@ The code uses [p5.js](https://p5js.org).
 
 Note that the page needs to *served* over HTTPS, and *viewed* on a mobile device.
 
-Two ways to do this are:
+Some ways to do this are:
+
+- Run the code on the [P5 Web Editor](https://editor.p5js.org), or (untested)
+  JSFiddle or CodePen.
+
+- Serve the project from your laptop. For example: (a) Open the project in
+  Visual Studio Code; (b) use the Live Server extension; (c) Use ngrok to create
+  an HTTPS address for it; (d) visit the `https://` URL on your phone.
 
 - Publish the file to GitHub Pages, Netlify, or Vercel. (This is a very slow
   development cycle.)
 
-- (a) Serve the project from your laptop. For example, open it in Visual Studio
-  Code, and use the Live Server extension. (b) Use ngrok to create an HTTPS
-  address for it. (c) Visit the `https://` URL on your phone.
-
 This doesn't work:
 
-- Run the program in OpenProcessing.org. (This doesn't work because “Source
-  frame did not have the same security origin as the main page.”)
-
-I haven't tried serving the code from Glitch, JSFiddle, or CodePen.
+- Run the program in OpenProcessing.org. This doesn't work because “Source frame
+  did not have the same security origin as the main page.” Example:
+  <https://openprocessing.org/sketch/1208470>
 
 ## Gotchas
 
