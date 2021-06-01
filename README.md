@@ -73,6 +73,12 @@ Other documentation:
 
 [Detecting Device Orientation]: https://developer.mozilla.org/en-US/docs/Web/Events/Detecting_device_orientation
 
+## Credits
+
+The “View Source” CSS is adapted from Christian Heilmann and Ildar Sagdejev's
+[Pure CSS responsive "Fork me on GitHub"
+ribbon](http://codepo8.github.io/css-fork-on-github-ribbon/).
+
 ## License
 
 MIT
